@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
+
+import { CurrentUserContext } from '../context/CurrentUserContext';
+
+import api from '../utils/api';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
 import ImagePopup from './ImagePopup';
-import { CurrentUserContext } from '../context/CurrentUserContext';
-import api from '../utils/api';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ConfirmCardDelete from './ConfirmCardDelete';
+
 import Login from './Login';
 import Register from './Register';
-import ProtectedRoute from './ProtectedRoute';
-import PopupRegisterCheck from './PopupRegisterCheck'
 
-import registerSucc from '../images/register-success.png';
-import registerFail from '../images/register-fail.png';
+import ProtectedRoute from './ProtectedRoute';
 
 
 function App() {
@@ -27,24 +27,15 @@ function App() {
     const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
     const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
     const [isConfirmCardDeletePopupOpen, setConfirmCardDeletePopupOpen] = useState(false);
-    const [isRegisterCheckPopupOpen, setRegisterCheckPopupOpen] = useState(true);
     const [selectedCard, setSelectedCard] = useState(null);
     const [cardToDelete, setCardToDelete] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [registerPopupData, setRegisterPopupData] = useState({})
-
-    useEffect(() => {
-        setRegisterPopupData({
-            img: registerSucc,
-            title: 'Вы успешно зарегистрировались!'
-        })
-    }, [])
 
     // стейт-переменные данных на странице
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
 
-    const [loggedIn, setLoggedIn] = useState(true);
+    const [loggedIn, setLoggedIn] = useState(false);
 
     // УПРАВЛЕНИЕ КЛИКОМ НА КНОПКИ/КАРТОЧКУ
 
@@ -71,30 +62,34 @@ function App() {
         setConfirmCardDeletePopupOpen(false);
         setSelectedCard(null);
         setCardToDelete(null);
-        setRegisterCheckPopupOpen(false);
+        // setRegisterCheckPopupOpen(false);
     }
 
     // ЗАПРОСЫ В API
 
     // отправка запроса в API, получение данных пользователя, запись в переменную 
     useEffect(() => {
-        api
-            .getInitialUserInfo()
-            .then(userInfo => {
-                setCurrentUser(userInfo);
-            })
-            .catch(err => console.log(err)); // проглядел :)
-    }, [currentUser._id])
+        if (loggedIn) {
+            api
+                .getInitialUserInfo()
+                .then(userInfo => {
+                    setCurrentUser(userInfo);
+                })
+                .catch(err => console.log(err));
+        }
+    }, [loggedIn])
 
     // отправка запроса в API, получение начальных карточек, запись в переменную
     useEffect(() => {
-        api
-            .getInitialCards()
-            .then((cards) => {
-                setCards(cards);
-            })
-            .catch(err => console.log(err));
-    }, [currentUser._id]);
+        if (loggedIn) {
+            api
+                .getInitialCards()
+                .then((cards) => {
+                    setCards(cards);
+                })
+                .catch(err => console.log(err));
+        }
+    }, [loggedIn]);
 
     // управление лайком в API и в карточке на странице
     function handleCardLike(card) {
@@ -162,22 +157,15 @@ function App() {
             .catch(err => console.log(err));
     }
 
-    function handleLogin() {
-        console.log('вход')
+    const handleLogin = (email) => {
+        // console.log(currentUser.email);
+        setLoggedIn(true);
     }
-
-    function handleRegister() {
-        console.log('регистрация')
-    }
-
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
-                <Header
-                    loggedIn={loggedIn}
-                    currentUser={currentUser}
-                />
+                <Header currentUser={currentUser} />
 
                 <Switch>
                     {/* ниже разместим защищённые маршруты */}
@@ -195,16 +183,10 @@ function App() {
                         onCardDelete={handleDeleteCardClick}
                     />
                     <Route exact path="/login">
-                        <Login handleLogin={handleLogin} />
+                        <Login onLogin={handleLogin} />
                     </Route>
                     <Route exact path="/register">
-                        <Register handleRegister={handleRegister} />
-                        <PopupRegisterCheck
-                            registerPopupData={registerPopupData}
-                            name={'register-check'}
-                            onClose={closeAllPopups}
-                            isOpen={isRegisterCheckPopupOpen}
-                        />
+                        <Register />
                     </Route>
                     <Route>
                         {loggedIn ? (

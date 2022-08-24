@@ -1,7 +1,7 @@
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Link } from 'react-router-dom';
 import headerLogo from '../images/header-logo.svg';
 
-function Header({ currentUser, loggedIn }) {
+function Header({ currentUser }) {
     return (
         <header className="header">
             <a className="link" href="./index.html">
@@ -10,14 +10,14 @@ function Header({ currentUser, loggedIn }) {
             <div className='header__elements'>
                 <Switch>
                     <Route exact path='/login'>
-                        <a className="header__link link" href="#">Регистрация</a>
+                        <Link className="header__link link" to="/register">Регистрация</Link>
                     </Route>
                     <Route exact path='/register'>
-                        <a className="header__link link" href="#">Вход</a>
+                        <Link className="header__link link" to="/login">Вход</Link>
                     </Route>
                     <Route path='/'>
                         <p className='header__profile'>{currentUser?.name}</p>
-                        <a className="header__link link" href="#">Выход</a>
+                        <Link className="header__link link" to="/login">Выход</Link>
                     </Route>
                 </Switch>
             </div>

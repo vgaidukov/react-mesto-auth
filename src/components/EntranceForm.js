@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+// import { useState, useContext, useEffect } from 'react';
 
 function EntranceForm({
     name,
@@ -7,11 +7,12 @@ function EntranceForm({
     submitButtonNameOnLoading,
     children,
     onSubmit,
-    isLoading }
-) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
+    isLoading,
+    onEmailChange,
+    onPasswordChange,
+    email,
+    password
+}) {
     return (
         <div className={`entrance-page entrance-page_type_${name}`}>
             <form
@@ -31,7 +32,7 @@ function EntranceForm({
                         minLength="2"
                         maxLength="40"
                         value={email || ''}
-                        onChange={(e) => { setEmail(e.target.value) }} />
+                        onChange={onEmailChange} />
                 </label>
                 <label className="entrance-page__field">
                     <input
@@ -44,7 +45,7 @@ function EntranceForm({
                         minLength="2"
                         maxLength="40"
                         value={password || ''}
-                        onChange={(e) => { setPassword(e.target.value) }} />
+                        onChange={onPasswordChange} />
                 </label>
                 <button
                     type="submit"
