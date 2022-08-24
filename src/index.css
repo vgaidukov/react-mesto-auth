@@ -8,8 +8,21 @@
 @import url('./blocks/body/body.css');
 @import url('./blocks/page/page.css');
 @import url('./blocks/main/main.css');
+
 @import url('./blocks/header/header.css');
 @import url('./blocks/header/__logo/header__logo.css');
+@import url('./blocks/header/__elements/header__elements.css');
+@import url('./blocks/header/__profile/header__profile.css');
+@import url('./blocks/header/__link/header__link.css');
+
+@import url('./blocks/entrance-page/entrance-page.css');
+@import url('./blocks/entrance-page/__form/entrance-page__form.css');
+@import url('./blocks/entrance-page/__title/entrance-page__title.css');
+@import url('./blocks/entrance-page/__field/entrance-page__field.css');
+@import url('./blocks/entrance-page/__input/entrance-page__input.css');
+@import url('./blocks/entrance-page/__submit-button/entrance-page__submit-button.css');
+@import url('./blocks/entrance-page/__text/entrance-page__text.css');
+@import url('./blocks/entrance-page/__link/entrance-page__link.css');
 
 @import url('./blocks/profile/profile.css');
 @import url('./blocks/profile/__info/profile__info.css');
@@ -42,12 +55,14 @@
 @import url('./blocks/popup/__window/popup__window.css');
 @import url('./blocks/popup/__window/_type/popup__window_type_form.css');
 @import url('./blocks/popup/__window/_type/popup__window_type_card-delete-confirmation.css');
+@import url('./blocks/popup/__window/_type/popup__window_type_register-check.css');
 @import url('./blocks/popup/__container/popup__container.css');
 @import url('./blocks/popup/__close-button/popup__close-button.css');
 @import url('./blocks/popup/__form/popup__form.css');
 @import url('./blocks/popup/__title/popup__title.css');
 @import url('./blocks/popup/__title/_type/popup__title_type_form.css');
 @import url('./blocks/popup/__title/_type/popup__title_type_card-delete-confirmation.css');
+@import url('./blocks/popup/__title/_type/popup__title_type_register-check.css');
 @import url('./blocks/popup/__field/popup__field.css');
 @import url('./blocks/popup/__input/popup__input.css');
 @import url('./blocks/popup/__input/_type/popup__input_type_error.css');

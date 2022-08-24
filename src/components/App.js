@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -9,6 +10,14 @@ import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ConfirmCardDelete from './ConfirmCardDelete';
+import Login from './Login';
+import Register from './Register';
+import ProtectedRoute from './ProtectedRoute';
+import PopupRegisterCheck from './PopupRegisterCheck'
+
+import registerSucc from '../images/register-success.png';
+import registerFail from '../images/register-fail.png';
+
 
 function App() {
     // ПЕРЕМЕННЫЕ
@@ -18,13 +27,24 @@ function App() {
     const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
     const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
     const [isConfirmCardDeletePopupOpen, setConfirmCardDeletePopupOpen] = useState(false);
+    const [isRegisterCheckPopupOpen, setRegisterCheckPopupOpen] = useState(true);
     const [selectedCard, setSelectedCard] = useState(null);
     const [cardToDelete, setCardToDelete] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [registerPopupData, setRegisterPopupData] = useState({})
+
+    useEffect(() => {
+        setRegisterPopupData({
+            img: registerSucc,
+            title: 'Вы успешно зарегистрировались!'
+        })
+    }, [])
 
     // стейт-переменные данных на странице
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
+
+    const [loggedIn, setLoggedIn] = useState(true);
 
     // УПРАВЛЕНИЕ КЛИКОМ НА КНОПКИ/КАРТОЧКУ
 
@@ -51,6 +71,7 @@ function App() {
         setConfirmCardDeletePopupOpen(false);
         setSelectedCard(null);
         setCardToDelete(null);
+        setRegisterCheckPopupOpen(false);
     }
 
     // ЗАПРОСЫ В API
@@ -141,18 +162,59 @@ function App() {
             .catch(err => console.log(err));
     }
 
+    function handleLogin() {
+        console.log('вход')
+    }
+
+    function handleRegister() {
+        console.log('регистрация')
+    }
+
+
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
-                <Header />
-                <Main
-                    onEditProfile={handleEditProfileClick}
-                    onAddPlace={handleAddCardClick}
-                    onEditAvatar={handleEditAvatarClick}
-                    cards={cards}
-                    onCardClick={handleCardClick}
-                    onCardLike={handleCardLike}
-                    onCardDelete={handleDeleteCardClick} />
+                <Header
+                    loggedIn={loggedIn}
+                    currentUser={currentUser}
+                />
+
+                <Switch>
+                    {/* ниже разместим защищённые маршруты */}
+                    {/* и передадим несколько пропсов: loggedIn, path, component */}
+                    <ProtectedRoute
+                        exact path="/"
+                        loggedIn={loggedIn}
+                        component={Main}
+                        onEditProfile={handleEditProfileClick}
+                        onAddPlace={handleAddCardClick}
+                        onEditAvatar={handleEditAvatarClick}
+                        cards={cards}
+                        onCardClick={handleCardClick}
+                        onCardLike={handleCardLike}
+                        onCardDelete={handleDeleteCardClick}
+                    />
+                    <Route exact path="/login">
+                        <Login handleLogin={handleLogin} />
+                    </Route>
+                    <Route exact path="/register">
+                        <Register handleRegister={handleRegister} />
+                        <PopupRegisterCheck
+                            registerPopupData={registerPopupData}
+                            name={'register-check'}
+                            onClose={closeAllPopups}
+                            isOpen={isRegisterCheckPopupOpen}
+                        />
+                    </Route>
+                    <Route>
+                        {loggedIn ? (
+                            <Redirect to="/" />
+                        ) : (
+                            <Redirect to="/login" />
+                        )}
+                    </Route>
+                </Switch>
+
                 <Footer />
                 <EditAvatarPopup
                     isOpen={isEditAvatarPopupOpen}
