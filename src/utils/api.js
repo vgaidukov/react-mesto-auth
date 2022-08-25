@@ -5,7 +5,7 @@ class Api {
     }
 
     getInitialUserInfo() {
-        return fetch(`${this._baseUrl}//users/me`, {
+        return fetch(`${this._baseUrl}/users/me`, {
             method: 'GET',
             headers: this._headers
         })
@@ -21,7 +21,7 @@ class Api {
     }
 
     patchUserInfo(data) {
-        return fetch(`${this._baseUrl}//users/me`, {
+        return fetch(`${this._baseUrl}/users/me`, {
             method: 'PATCH',
             headers: this._headers,
             body: JSON.stringify({

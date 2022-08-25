@@ -1,9 +1,13 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { CurrentUserContext } from '../context/CurrentUserContext';
 import Card from './Card';
 
-function Main({ onEditProfile, onAddPlace, onEditAvatar, cards, onCardClick, onCardLike, onCardDelete }) {
+function Main({ onMount, onEditProfile, onAddPlace, onEditAvatar, cards, onCardClick, onCardLike, onCardDelete }) {
     const currentUser = useContext(CurrentUserContext);
+
+    useEffect(() => {
+        onMount();
+    }, [])
 
     return (
         <main className="main">
@@ -23,7 +27,6 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, cards, onCardClick, onC
                             aria-label="Изменить"
                             className="profile__edit-button button"
                             onClick={onEditProfile} />
-                        {/* </button> */}
                     </div>
                     <p className="profile__description">{currentUser.about}</p>
                 </div>

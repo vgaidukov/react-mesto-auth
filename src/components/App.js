@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
-
+import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 import { CurrentUserContext } from '../context/CurrentUserContext';
 
+import ProtectedRoute from './ProtectedRoute';
 import api from '../utils/api';
+import * as mestoAuth from '../utils/mestoAuth'
+
 import Header from './Header';
+import Login from './Login';
+import Register from './Register';
 import Main from './Main';
 import Footer from './Footer';
 import ImagePopup from './ImagePopup';
@@ -13,11 +17,8 @@ import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ConfirmCardDelete from './ConfirmCardDelete';
 
-import Login from './Login';
-import Register from './Register';
-
-import ProtectedRoute from './ProtectedRoute';
-
+import registerSucc from '../images/register-success.png';
+import registerFail from '../images/register-fail.png';
 
 function App() {
     // ПЕРЕМЕННЫЕ
@@ -27,15 +28,30 @@ function App() {
     const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
     const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
     const [isConfirmCardDeletePopupOpen, setConfirmCardDeletePopupOpen] = useState(false);
+    const [isInfoTooltipOpen, setInfoTooltipOpen] = useState(false);
+
+    const [infoTooltipData, setInfoTooltipData] = useState({})
     const [selectedCard, setSelectedCard] = useState(null);
     const [cardToDelete, setCardToDelete] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+
     // стейт-переменные данных на странице
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [userEmail, setUserEmail] = useState('');
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
 
-    const [loggedIn, setLoggedIn] = useState(false);
+    const history = useHistory();
+
+    const messageSuccess = {
+        img: registerSucc,
+        title: 'Вы успешно зарегистрировались!'
+    }
+    const messageFail = {
+        img: registerFail,
+        title: 'Что-то пошло не так! Попробуйте еще раз.'
+    }
 
     // УПРАВЛЕНИЕ КЛИКОМ НА КНОПКИ/КАРТОЧКУ
 
@@ -62,41 +78,27 @@ function App() {
         setConfirmCardDeletePopupOpen(false);
         setSelectedCard(null);
         setCardToDelete(null);
-        // setRegisterCheckPopupOpen(false);
+        setInfoTooltipOpen(false);
     }
 
     // ЗАПРОСЫ В API
 
-    // отправка запроса в API, получение данных пользователя, запись в переменную 
-    useEffect(() => {
-        if (loggedIn) {
-            api
-                .getInitialUserInfo()
-                .then(userInfo => {
-                    setCurrentUser(userInfo);
-                })
-                .catch(err => console.log(err));
-        }
-    }, [loggedIn])
-
-    // отправка запроса в API, получение начальных карточек, запись в переменную
-    useEffect(() => {
-        if (loggedIn) {
-            api
-                .getInitialCards()
-                .then((cards) => {
-                    setCards(cards);
-                })
-                .catch(err => console.log(err));
-        }
-    }, [loggedIn]);
+    // получение данных пользователя и карточек
+    function getInitialData() {
+        Promise.all([
+            api.getInitialUserInfo(),
+            api.getInitialCards()
+        ])
+            .then((data) => {
+                setCurrentUser(data[0]);
+                setCards(data[1]);
+            })
+            .catch(err => console.log(err));
+    }
 
     // управление лайком в API и в карточке на странице
     function handleCardLike(card) {
-        // Снова проверяем, есть ли уже лайк на этой карточке
         const isLiked = card.likes.some(i => i._id === currentUser._id);
-
-        // Отправляем запрос в API и получаем обновлённые данные карточки
         api
             .changeLikeCardStatus(card._id, !isLiked)
             .then((newCard) => {
@@ -157,23 +159,80 @@ function App() {
             .catch(err => console.log(err));
     }
 
-    const handleLogin = (email) => {
-        // console.log(currentUser.email);
-        setLoggedIn(true);
+    // АВТОРИЗАЦИЯ
+
+    const onRegister = ({ password, email }) => {
+        setIsLoading(true);
+        return mestoAuth
+            .register(password, email)
+            .then((res) => {
+                setIsLoading(false);
+                setInfoTooltipOpen(true)
+                if (res.data) {
+                    setInfoTooltipData(messageSuccess)
+                } else {
+                    setInfoTooltipData(messageFail);
+                    throw new Error(res.message);
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+
+    };
+
+    const onLogin = ({ password, email }) => {
+        setIsLoading(true);
+        return mestoAuth
+            .authorize(password, email)
+            .then((res) => {
+                setIsLoading(false);
+                if (!res) throw new Error('Неправильные имя пользователя или пароль');
+                if (res.token) {
+                    setLoggedIn(true);
+                }
+            })
+            .catch((err) => { console.log(err) })
+    };
+
+    const onSignOut = () => {
+        localStorage.removeItem('token');
+        setLoggedIn(false);
+        history.push('/login');
+    };
+
+    const auth = (token) => {
+        return mestoAuth.validate(token)
+            .then((res) => {
+                if (res) {
+                    setLoggedIn(true);
+                    setUserEmail(res.data.email);
+                    history.push('/');
+                }
+            })
+            .catch(err => console.log(err));
     }
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            auth(token);
+        }
+    }, [loggedIn]);
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
-                <Header currentUser={currentUser} />
-
+                <Header
+                    email={userEmail}
+                    onSignOut={onSignOut}
+                />
                 <Switch>
-                    {/* ниже разместим защищённые маршруты */}
-                    {/* и передадим несколько пропсов: loggedIn, path, component */}
                     <ProtectedRoute
                         exact path="/"
                         loggedIn={loggedIn}
                         component={Main}
+                        onMount={getInitialData}
                         onEditProfile={handleEditProfileClick}
                         onAddPlace={handleAddCardClick}
                         onEditAvatar={handleEditAvatarClick}
@@ -183,17 +242,23 @@ function App() {
                         onCardDelete={handleDeleteCardClick}
                     />
                     <Route exact path="/login">
-                        <Login onLogin={handleLogin} />
+                        <Login
+                            onLogin={onLogin}
+                            isLoading={isLoading}
+                        />
                     </Route>
                     <Route exact path="/register">
-                        <Register />
+                        <Register
+                            onRegister={onRegister}
+                            isLoading={isLoading}
+                            isOpen={isInfoTooltipOpen}
+                            onClose={closeAllPopups}
+                            infoTooltipData={infoTooltipData}
+                            messageSuccess={messageSuccess}
+                        />
                     </Route>
                     <Route>
-                        {loggedIn ? (
-                            <Redirect to="/" />
-                        ) : (
-                            <Redirect to="/login" />
-                        )}
+                        {loggedIn ? <Redirect to="/" /> : <Redirect to="/login" />}
                     </Route>
                 </Switch>
 

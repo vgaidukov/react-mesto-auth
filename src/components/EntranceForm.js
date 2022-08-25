@@ -1,5 +1,3 @@
-// import { useState, useContext, useEffect } from 'react';
-
 function EntranceForm({
     name,
     title,

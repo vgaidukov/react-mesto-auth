@@ -1,65 +1,46 @@
 import { useState } from "react";
 import { useHistory, Link } from "react-router-dom";
-import * as mestoAuth from './mestoAuth'
 
 import EntranceForm from "./EntranceForm";
-import PopupRegisterCheck from './PopupRegisterCheck'
+import InfoTooltip from "./InfoTooltip";
 
-import registerSucc from '../images/register-success.png';
-import registerFail from '../images/register-fail.png';
-
-function Register() {
-    const history = useHistory();
-
+function Register({
+    onRegister,
+    infoTooltipData,
+    isOpen,
+    onClose,
+    isLoading,
+    messageSuccess
+}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const history = useHistory();
 
-    const [registerPopupData, setRegisterPopupData] = useState({})
-    const [isRegisterCheckPopupOpen, setRegisterCheckPopupOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const messageSuccess = {
-        img: registerSucc,
-        title: 'Вы успешно зарегистрировались!'
-    }
-    const messageFail = {
-        img: registerFail,
-        title: 'Что-то пошло не так! Попробуйте еще раз.'
-    }
-
-    const handlePopupClose = () => {
-        setRegisterCheckPopupOpen(false)
-        if (JSON.stringify(registerPopupData) === JSON.stringify(messageSuccess)) {
-            history.push('/login');
-        }
-    }
+    const resetForm = () => {
+        setEmail('');
+        setPassword('');
+    };
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
     }
-
     const handlePasswordChange = (e) => {
         setPassword(e.target.value)
     }
 
+    function handlePopupClose() {
+        onClose();
+        if (JSON.stringify(infoTooltipData) === JSON.stringify(messageSuccess)) {
+            history.push('/login');
+        }
+    }
+
     function handleSubmit(e) {
         e.preventDefault();
-        console.log(password, email);
-        setIsLoading(true);
-        mestoAuth.register(password, email)
-            .then((res) => {
-                if (res) {
-                    setIsLoading(false);
-                    setRegisterPopupData(messageSuccess);
-                    setRegisterCheckPopupOpen(true);
-                } else {
-                    setIsLoading(false);
-                    setRegisterPopupData(messageFail)
-                    setRegisterCheckPopupOpen(true)
-                }
-            })
-            .catch(err => console.log(err));
-    }
+        onRegister({ password, email })
+            .then(resetForm)
+            .catch((err) => console.log(err.message || 'Что-то пошло не так'));
+    };
 
     return (
         <>
@@ -79,11 +60,11 @@ function Register() {
                     <Link className="link entrance-page__link" to='/login'>Войти</Link>
                 </p>
             </EntranceForm>
-            <PopupRegisterCheck
-                registerPopupData={registerPopupData}
-                name={'register-check'}
+            <InfoTooltip
+                infoTooltipData={infoTooltipData}
+                name={'info-tooltip'}
                 onClose={handlePopupClose}
-                isOpen={isRegisterCheckPopupOpen}
+                isOpen={isOpen}
             />
         </>
 
