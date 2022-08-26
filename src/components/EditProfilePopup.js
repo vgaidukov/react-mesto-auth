@@ -1,77 +1,74 @@
-import { useState, useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { CurrentUserContext } from '../context/CurrentUserContext';
-import PopupWithForm from './PopupWithForm';
+import Popup from './Popup';
+import { useForm } from '../hooks/hooks';
+import Form from './Form';
+import Input from './Input';
 
 function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
-    const currentUser = useContext(CurrentUserContext)
-    const [name, setName] = useState(currentUser.name);
-    const [description, setDescription] = useState(currentUser.about);
+    const currentUser = useContext(CurrentUserContext);
+    const { values, handleChange, setValues } = useForm({});
 
     useEffect(() => {
-        setName(currentUser.name);
-        setDescription(currentUser.about);
-    }, [currentUser])
-
-    function handleNameChange(e) {
-        setName(e.target.value);
-    }
-
-    function handleDescriptionChange(e) {
-        setDescription(e.target.value);
-    }
+        setValues({
+            name: currentUser.name,
+            description: currentUser.about
+        })
+    }, [currentUser, isOpen])
 
     function handleSubmit(e) {
-        // Запрещаем браузеру переходить по адресу формы
         e.preventDefault();
-
-        // Передаём значения управляемых компонентов во внешний обработчик
         onUpdateUser({
-            name: name,
-            about: description
+            name: values.name,
+            about: values.description
         });
     }
 
-
     return (
-        <PopupWithForm
+        <Popup
             name="profile"
-            title="Редактировать профиль"
-            submitButtonName="Сохранить"
-            submitButtonNameOnLoading="Сохранение ..."
-            isLoading={isLoading}
             isOpen={isOpen}
             onClose={onClose}
-            onSubmit={handleSubmit}
         >
-            <label className="popup__field">
-                <input
-                    type="text"
-                    id="profile-name-input"
-                    name="profile-name"
-                    className="popup__input popup__input_type_name"
-                    placeholder="Имя"
-                    required
-                    minLength="2"
-                    maxLength="40"
-                    value={name || ''}
-                    onChange={handleNameChange} />
-                <span className="popup__input-error profile-name-input-error"></span>
-            </label>
-            <label className="popup__field">
-                <input
-                    type="text"
-                    id="profile-description-input"
-                    name="profile-description"
-                    className="popup__input popup__input_type_description"
-                    placeholder="Описание"
-                    required
-                    minLength="2"
-                    maxLength="200"
-                    value={description || ''}
-                    onChange={handleDescriptionChange} />
-                <span className="popup__input-error profile-description-input-error" ></span>
-            </label>
-        </PopupWithForm>
+            <Form
+                title="Редактировать профиль"
+                submitButtonName="Сохранить"
+                submitButtonNameOnLoading="Сохранение ..."
+                isLoading={isLoading}
+                onSubmit={handleSubmit}
+            >
+                <label className="popup__field">
+                    <Input
+                        type={"text"}
+                        id={"profile-name-input"}
+                        name={"name"}
+                        className={"popup__input popup__input_type_name"}
+                        placeholder={"Имя"}
+                        required={true}
+                        minLength="2"
+                        maxLength="40"
+                        value={values.name}
+                        onChange={handleChange}
+                    >
+                    </Input>
+                </label>
+                <label className="popup__field">
+                    <Input
+                        type={"text"}
+                        id={"profile-description-input"}
+                        name={"description"}
+                        className={"popup__input popup__input_type_description"}
+                        placeholder={"Описание"}
+                        required={true}
+                        minLength="2"
+                        maxLength="200"
+                        value={values.description}
+                        onChange={handleChange}
+                    >
+                    </Input>
+                </label>
+            </Form>
+        </Popup>
     )
 }
 

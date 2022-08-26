@@ -1,23 +1,26 @@
-import PopupWithForm from './PopupWithForm';
+import Popup from './Popup';
+import Form from './Form';
 
 function ConfirmCardDelete({ card, isOpen, onClose, onConfirmDelete, isLoading }) {
-    // console.log(isLoading);
     function handleSubmit(e) {
         e.preventDefault();
-
         onConfirmDelete(card)
     }
 
     return (
-        <PopupWithForm
+        <Popup
             name="card-delete-confirmation"
-            title="Вы уверены?"
-            submitButtonName="Да"
-            submitButtonNameOnLoading="Удаление ..."
-            isLoading={isLoading}
             isOpen={isOpen}
             onClose={onClose}
-            onSubmit={handleSubmit} />
+        >
+            <Form
+                title="Вы уверены?"
+                submitButtonName="Да"
+                submitButtonNameOnLoading="Удаление ..."
+                isLoading={isLoading}
+                onSubmit={handleSubmit}
+            />
+        </Popup >
     )
 }
 

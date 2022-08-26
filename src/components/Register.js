@@ -1,39 +1,22 @@
-import { useState } from "react";
-import { useHistory, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
+import { useForm } from '../hooks/hooks'
 import EntranceForm from "./EntranceForm";
-import InfoTooltip from "./InfoTooltip";
 
 function Register({
     onRegister,
-    infoTooltipData,
-    isOpen,
-    onClose,
     isLoading,
-    messageSuccess
 }) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const history = useHistory();
+    const { values, handleChange, setValues } = useForm({});
+    const email = values.email || '';
+    const password = values.password || '';
 
     const resetForm = () => {
-        setEmail('');
-        setPassword('');
+        setValues({
+            email: '',
+            password: ''
+        })
     };
-
-    const handleEmailChange = (e) => {
-        setEmail(e.target.value)
-    }
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value)
-    }
-
-    function handlePopupClose() {
-        onClose();
-        if (JSON.stringify(infoTooltipData) === JSON.stringify(messageSuccess)) {
-            history.push('/login');
-        }
-    }
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -51,8 +34,7 @@ function Register({
                 submitButtonNameOnLoading="Регистрация ..."
                 isLoading={isLoading}
                 onSubmit={handleSubmit}
-                onEmailChange={handleEmailChange}
-                onPasswordChange={handlePasswordChange}
+                onChange={handleChange}
                 email={email}
                 password={password}
             >
@@ -60,12 +42,6 @@ function Register({
                     <Link className="link entrance-page__link" to='/login'>Войти</Link>
                 </p>
             </EntranceForm>
-            <InfoTooltip
-                infoTooltipData={infoTooltipData}
-                name={'info-tooltip'}
-                onClose={handlePopupClose}
-                isOpen={isOpen}
-            />
         </>
 
     );

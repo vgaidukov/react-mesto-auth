@@ -1,24 +1,21 @@
-import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import EntranceForm from "./EntranceForm";
+import { useForm } from '../hooks/hooks';
 
 function Login({ onLogin, isLoading }) {
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const history = useHistory();
+    const { values, handleChange, setValues } = useForm({});
+    const email = values.email || '';
+    const password = values.password || '';
+
 
     const resetForm = () => {
-        setEmail('');
-        setPassword('');
+        setValues({
+            email: '',
+            password: ''
+        })
     };
-
-    const handleEmailChange = (e) => {
-        setEmail(e.target.value)
-    }
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value)
-    }
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -28,6 +25,8 @@ function Login({ onLogin, isLoading }) {
             .catch((err) => console.log(err.message || 'Что-то пошло не так'));
     }
 
+    // к сожалению, не хватило времени переписать форму и инпуты на компоненты, но принцип понятен, спасибо! :)
+
     return (
         <EntranceForm
             name="login"
@@ -36,8 +35,7 @@ function Login({ onLogin, isLoading }) {
             submitButtonNameOnLoading="Вход ..."
             isLoading={isLoading}
             onSubmit={handleSubmit}
-            onEmailChange={handleEmailChange}
-            onPasswordChange={handlePasswordChange}
+            onChange={handleChange}
             email={email}
             password={password}
         />

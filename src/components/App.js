@@ -16,6 +16,7 @@ import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ConfirmCardDelete from './ConfirmCardDelete';
+import InfoTooltip from "./InfoTooltip";
 
 import registerSucc from '../images/register-success.png';
 import registerFail from '../images/register-fail.png';
@@ -27,14 +28,13 @@ function App() {
     const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
     const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
     const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
-    const [isConfirmCardDeletePopupOpen, setConfirmCardDeletePopupOpen] = useState(false);
-    const [isInfoTooltipOpen, setInfoTooltipOpen] = useState(false);
-
-    const [infoTooltipData, setInfoTooltipData] = useState({})
     const [selectedCard, setSelectedCard] = useState(null);
+    const [isConfirmCardDeletePopupOpen, setConfirmCardDeletePopupOpen] = useState(false);
+    const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+
+    const [infoTooltipMessage, setInfoTooltipMessage] = useState({})
     const [cardToDelete, setCardToDelete] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
 
     // стейт-переменные данных на странице
     const [loggedIn, setLoggedIn] = useState(false);
@@ -51,6 +51,17 @@ function App() {
     const messageFail = {
         img: registerFail,
         title: 'Что-то пошло не так! Попробуйте еще раз.'
+    }
+
+    const clearInfoTooltipMessage = () => {
+        setInfoTooltipMessage({})
+    }
+
+    const redirectOnInfoTooltipClose = () => {
+        if (JSON.stringify(infoTooltipMessage) === JSON.stringify(messageSuccess)) {
+            history.push('/login');
+            clearInfoTooltipMessage();
+        }
     }
 
     // УПРАВЛЕНИЕ КЛИКОМ НА КНОПКИ/КАРТОЧКУ
@@ -78,8 +89,24 @@ function App() {
         setConfirmCardDeletePopupOpen(false);
         setSelectedCard(null);
         setCardToDelete(null);
-        setInfoTooltipOpen(false);
+        setIsInfoTooltipOpen(false);
+        redirectOnInfoTooltipClose();
     }
+
+    // закрытие по Esc
+    useEffect(() => {
+        function closeByEscape(evt) {
+            if (evt.key === 'Escape') {
+                closeAllPopups();
+            }
+        }
+        if (selectedCard) {
+            document.addEventListener('keydown', closeByEscape);
+            return () => {
+                document.removeEventListener('keydown', closeByEscape);
+            }
+        }
+    }, [selectedCard])
 
     // ЗАПРОСЫ В API
 
@@ -89,9 +116,9 @@ function App() {
             api.getInitialUserInfo(),
             api.getInitialCards()
         ])
-            .then((data) => {
-                setCurrentUser(data[0]);
-                setCards(data[1]);
+            .then(([userData, cards]) => {
+                setCurrentUser(userData);
+                setCards(cards);
             })
             .catch(err => console.log(err));
     }
@@ -162,22 +189,24 @@ function App() {
     // АВТОРИЗАЦИЯ
 
     const onRegister = ({ password, email }) => {
+        console.log(password, email);
         setIsLoading(true);
         return mestoAuth
             .register(password, email)
             .then((res) => {
-                setIsLoading(false);
-                setInfoTooltipOpen(true)
-                if (res.data) {
-                    setInfoTooltipData(messageSuccess)
-                } else {
-                    setInfoTooltipData(messageFail);
-                    throw new Error(res.message);
-                }
+                if (res.data) setInfoTooltipMessage(messageSuccess)
             })
             .catch((err) => {
-                console.log(err)
+                setInfoTooltipMessage(messageFail);
+                (err === 400)
+                    ? (console.log(`Ошибка 400 - некорректно заполнено одно из полей `))
+                    : (console.log(`Ошибка: ${err}`));
             })
+            .finally(() => {
+                setIsInfoTooltipOpen(true)
+                setIsLoading(false)
+            });
+
 
     };
 
@@ -186,13 +215,26 @@ function App() {
         return mestoAuth
             .authorize(password, email)
             .then((res) => {
-                setIsLoading(false);
-                if (!res) throw new Error('Неправильные имя пользователя или пароль');
-                if (res.token) {
-                    setLoggedIn(true);
+                if (res.token) setLoggedIn(true);
+            })
+            .catch((err) => {
+                setInfoTooltipMessage(messageFail);
+                setIsInfoTooltipOpen(true)
+                switch (err) {
+                    case 400:
+                        console.log('Ошибка 400: не передано одно из полей');
+                        break
+                    case 401:
+                        console.log('Ошибка 401 - Неправильные имя пользователя или пароль');
+                        break
+                    default:
+                        console.log(`Ошибка: ${err}`);
                 }
             })
-            .catch((err) => { console.log(err) })
+            .finally(() => {
+                setIsLoading(false)
+            });
+
     };
 
     const onSignOut = () => {
@@ -202,7 +244,7 @@ function App() {
     };
 
     const auth = (token) => {
-        return mestoAuth.validate(token)
+        return mestoAuth.validateToken(token)
             .then((res) => {
                 if (res) {
                     setLoggedIn(true);
@@ -210,7 +252,7 @@ function App() {
                     history.push('/');
                 }
             })
-            .catch(err => console.log(err));
+            .catch((err) => console.log(err));
     }
 
     useEffect(() => {
@@ -253,7 +295,7 @@ function App() {
                             isLoading={isLoading}
                             isOpen={isInfoTooltipOpen}
                             onClose={closeAllPopups}
-                            infoTooltipData={infoTooltipData}
+                            infoTooltipMessage={infoTooltipMessage}
                             messageSuccess={messageSuccess}
                         />
                     </Route>
@@ -287,6 +329,12 @@ function App() {
                 <ImagePopup
                     card={selectedCard}
                     onClose={closeAllPopups}
+                />
+                <InfoTooltip
+                    infoTooltipMessage={infoTooltipMessage}
+                    name={'info-tooltip'}
+                    onClose={closeAllPopups}
+                    isOpen={isInfoTooltipOpen}
                 />
             </div>
         </CurrentUserContext.Provider>

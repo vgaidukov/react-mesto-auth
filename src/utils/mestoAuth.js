@@ -8,10 +8,7 @@ export const register = (password, email) => {
         },
         body: JSON.stringify({ password, email })
     })
-        .then((response) => {
-            return response.json();
-        })
-        .catch((err) => console.log(err));
+        .then(res => checkServerResponse(res));
 };
 
 export const authorize = (password, email) => {
@@ -22,17 +19,16 @@ export const authorize = (password, email) => {
         },
         body: JSON.stringify({ password, email })
     })
-        .then((response => response.json()))
+        .then(res => checkServerResponse(res))
         .then((data) => {
             if (data.token) {
                 localStorage.setItem('token', data.token);
                 return data;
             }
         })
-        .catch(err => console.log(err))
 };
 
-export const validate = (token) => {
+export const validateToken = (token) => {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         headers: {
@@ -40,9 +36,14 @@ export const validate = (token) => {
             'Authorization': `Bearer ${token}`
         }
     })
-        .then(res => res.json())
-        .catch(err => console.log(err))
+        .then(res => checkServerResponse(res));
 };
 
+const checkServerResponse = (result) => {
+    if (result.ok) {
+        return result.json();
+    }
+    return Promise.reject(result.status);
+}
 
 

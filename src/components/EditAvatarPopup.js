@@ -1,44 +1,51 @@
-import { useEffect, useRef } from 'react';
-import PopupWithForm from './PopupWithForm';
+import { useEffect } from 'react';
+import Popup from './Popup';
+import { useForm } from '../hooks/hooks'
+import Form from './Form';
+import Input from './Input';
 
 function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
-    const avatarLinkRef = useRef();
+    const { values, handleChange, setValues } = useForm({});
 
     useEffect(() => {
-        avatarLinkRef.current.value = '';
+        setValues({ avatar: '' });
     }, [isOpen])
 
     function handleSubmit(e) {
         e.preventDefault();
-
         onUpdateAvatar({
-            avatar: avatarLinkRef.current.value,
+            avatar: values.avatar
         });
     }
 
     return (
-        <PopupWithForm
+        <Popup
             name="change-avatar"
-            title="Обновить аватар"
-            submitButtonName="Сохранить"
-            submitButtonNameOnLoading="Сохранение ..."
-            isLoading={isLoading}
             isOpen={isOpen}
             onClose={onClose}
-            onSubmit={handleSubmit}
         >
-            <label className="popup__field">
-                <input
-                    type="url"
-                    id="avatar-link-input"
-                    name="img-link"
-                    className="popup__input popup__input_type_img-link"
-                    placeholder="Ссылка на картинку"
-                    required
-                    ref={avatarLinkRef} />
-                <span className="popup__input-error avatar-link-input-error"></span>
-            </label>
-        </PopupWithForm>
+            <Form
+                title="Обновить аватар"
+                submitButtonName="Сохранить"
+                submitButtonNameOnLoading="Сохранение ..."
+                isLoading={isLoading}
+                onSubmit={handleSubmit}
+            >
+                <label className="popup__field">
+                    <Input
+                        type={"url"}
+                        id={"avatar-link-input"}
+                        name={"avatar"}
+                        className={"popup__input popup__input_type_img-link"}
+                        placeholder={"Ссылка на картинку"}
+                        required={true}
+                        value={values.avatar}
+                        onChange={handleChange}
+                    >
+                    </Input>
+                </label>
+            </Form>
+        </Popup>
     )
 }
 

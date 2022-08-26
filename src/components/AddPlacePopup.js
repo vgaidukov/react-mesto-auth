@@ -1,60 +1,71 @@
-import { useRef, useEffect } from 'react';
-import PopupWithForm from "./PopupWithForm";
+import { useEffect } from 'react';
+import Popup from "./Popup";
+import { useForm } from '../hooks/hooks';
+import Form from './Form';
+import Input from './Input';
 
 function AddPlacePopup({ isOpen, onClose, onAddPlace, isLoading }) {
-    const cardNameRef = useRef();
-    const imgLinkRef = useRef();
+    const { values, handleChange, setValues } = useForm({});
 
     useEffect(() => {
-        cardNameRef.current.value = '';
-        imgLinkRef.current.value = '';
+        setValues({
+            cardName: '',
+            imgLink: ''
+        })
     }, [isOpen])
 
     function handleSubmit(e) {
         e.preventDefault();
 
         onAddPlace({
-            name: cardNameRef.current.value,
-            link: imgLinkRef.current.value
+            name: values.cardName,
+            link: values.imgLink
         })
     }
 
     return (
-        <PopupWithForm
+        <Popup
             name="add-card"
-            title="Новое место"
-            submitButtonName="Создать"
-            submitButtonNameOnLoading="Создание ..."
-            isLoading={isLoading}
             isOpen={isOpen}
             onClose={onClose}
-            onSubmit={handleSubmit}
         >
-            <label className="popup__field">
-                <input
-                    type="text"
-                    id="card-name-input"
-                    name="card-name"
-                    className="popup__input popup__input_type_card-name"
-                    placeholder="Название"
-                    required
-                    minLength="2"
-                    maxLength="40"
-                    ref={cardNameRef} />
-                <span className="popup__input-error card-name-input-error"></span>
-            </label>
-            <label className="popup__field">
-                <input
-                    type="url"
-                    id="img-link-input"
-                    name="img-link"
-                    className="popup__input popup__input_type_img-link"
-                    placeholder="Ссылка на картинку"
-                    required
-                    ref={imgLinkRef} />
-                <span className="popup__input-error img-link-input-error"></span>
-            </label>
-        </PopupWithForm>
+            <Form
+                title="Новое место"
+                submitButtonName="Создать"
+                submitButtonNameOnLoading="Создание ..."
+                isLoading={isLoading}
+                onSubmit={handleSubmit}
+            >
+                <label className="popup__field">
+                    <Input
+                        type={"text"}
+                        id={"card-name-input"}
+                        name={"cardName"}
+                        className={"popup__input popup__input_type_card-name"}
+                        placeholder={"Название"}
+                        required={true}
+                        minLength={"2"}
+                        maxLength={"40"}
+                        value={values.cardName || ''}
+                        onChange={handleChange}
+                    >
+                    </Input>
+                </label>
+                <label className="popup__field">
+                    <Input
+                        type={"url"}
+                        id={"img-link-input"}
+                        name={"imgLink"}
+                        className={"popup__input popup__input_type_img-link"}
+                        placeholder={"Ссылка на картинку"}
+                        required={true}
+                        value={values.imgLink || ''}
+                        onChange={handleChange}
+                    >
+                    </Input>
+                </label>
+            </Form>
+        </Popup>
     )
 }
 

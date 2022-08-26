@@ -6,8 +6,7 @@ function EntranceForm({
     children,
     onSubmit,
     isLoading,
-    onEmailChange,
-    onPasswordChange,
+    onChange,
     email,
     password
 }) {
@@ -16,7 +15,6 @@ function EntranceForm({
             <form
                 name={name}
                 className="entrance-page__form"
-                noValidate
                 onSubmit={onSubmit}>
                 <h3 className={`entrance-page__title entrance-page__title_type_${name}`}>{title}</h3>
                 <label className="entrance-page__field">
@@ -29,8 +27,8 @@ function EntranceForm({
                         required
                         minLength="2"
                         maxLength="40"
-                        value={email || ''}
-                        onChange={onEmailChange} />
+                        value={email}
+                        onChange={onChange} />
                 </label>
                 <label className="entrance-page__field">
                     <input
@@ -42,8 +40,8 @@ function EntranceForm({
                         required
                         minLength="2"
                         maxLength="40"
-                        value={password || ''}
-                        onChange={onPasswordChange} />
+                        value={password}
+                        onChange={onChange} />
                 </label>
                 <button
                     type="submit"
