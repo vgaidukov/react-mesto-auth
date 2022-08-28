@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-
 import { useForm } from '../hooks/hooks'
-import EntranceForm from "./EntranceForm";
+import EntrancePage from "./EntrancePage";
 
 function Register({
     onRegister,
@@ -26,7 +25,7 @@ function Register({
     };
 
     return (
-        <EntranceForm
+        <EntrancePage
             name="register"
             title="Регистрация"
             submitButtonName="Зарегистрироваться"
@@ -40,7 +39,7 @@ function Register({
             <p className="entrance-page__text">Уже зарегистрированы?
                 <Link className="link entrance-page__link" to='/login'>Войти</Link>
             </p>
-        </EntranceForm>
+        </EntrancePage>
     );
 }
 

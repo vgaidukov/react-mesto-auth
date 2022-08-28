@@ -32,10 +32,11 @@ function Popup({
             className={`popup popup_type_${name} ${isOpen ? 'popup_opened' : ''}`}
             onClick={handleOverlay}
         >
-            <div className={`popup__window popup__window_type_${name} popup__content`}>
+
+            <div className="popup__container">
                 <button
                     type="button"
-                    className="popup__close-button popup__close-button_type_image button"
+                    className="popup__close-button button"
                     onClick={onClose}>
                 </button>
 

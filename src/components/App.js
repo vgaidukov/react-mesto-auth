@@ -28,9 +28,10 @@ function App() {
     const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
     const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
     const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
-    const [selectedCard, setSelectedCard] = useState(null);
     const [isConfirmCardDeletePopupOpen, setConfirmCardDeletePopupOpen] = useState(false);
     const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+    const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
+    const [selectedCard, setSelectedCard] = useState(null);
 
     const [infoTooltipMessage, setInfoTooltipMessage] = useState({})
     const [cardToDelete, setCardToDelete] = useState(null);
@@ -80,33 +81,21 @@ function App() {
         setConfirmCardDeletePopupOpen(true);
     }
     function handleCardClick(card) {
-        setSelectedCard(card)
+        setSelectedCard(card);
+        setIsImagePopupOpen(true);
+
     }
     function closeAllPopups() {
         setEditAvatarPopupOpen(false);
         setEditProfilePopupOpen(false);
         setAddPlacePopupOpen(false);
         setConfirmCardDeletePopupOpen(false);
+        setIsImagePopupOpen(false)
         setSelectedCard(null);
         setCardToDelete(null);
         setIsInfoTooltipOpen(false);
         redirectOnInfoTooltipClose();
     }
-
-    // закрытие по Esc
-    useEffect(() => {
-        function closeByEscape(evt) {
-            if (evt.key === 'Escape') {
-                closeAllPopups();
-            }
-        }
-        if (selectedCard) {
-            document.addEventListener('keydown', closeByEscape);
-            return () => {
-                document.removeEventListener('keydown', closeByEscape);
-            }
-        }
-    }, [selectedCard])
 
     // ЗАПРОСЫ В API
 
@@ -330,6 +319,7 @@ function App() {
                     isLoading={isLoading} />
                 <ImagePopup
                     card={selectedCard}
+                    isOpen={isImagePopupOpen}
                     onClose={closeAllPopups}
                 />
                 <InfoTooltip

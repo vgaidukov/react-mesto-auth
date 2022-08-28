@@ -1,4 +1,7 @@
-function EntranceForm({
+import Form from "./Form";
+import Input from "./Input";
+
+function EntrancePage({
     name,
     title,
     submitButtonName,
@@ -12,13 +15,16 @@ function EntranceForm({
 }) {
     return (
         <div className={`entrance-page entrance-page_type_${name}`}>
-            <form
+            <Form
+                elementName={'entrance-page'}
                 name={name}
-                className="entrance-page__form"
+                title={title}
+                submitButtonName={submitButtonName}
+                submitButtonNameOnLoading={submitButtonNameOnLoading}
+                isLoading={isLoading}
                 onSubmit={onSubmit}>
-                <h3 className={`entrance-page__title entrance-page__title_type_${name}`}>{title}</h3>
                 <label className="entrance-page__field">
-                    <input
+                    <Input
                         type="email"
                         id="email-input"
                         name="email"
@@ -28,10 +34,11 @@ function EntranceForm({
                         minLength="2"
                         maxLength="40"
                         value={email}
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                 </label>
                 <label className="entrance-page__field">
-                    <input
+                    <Input
                         type="password"
                         id="password-input"
                         name="password"
@@ -41,17 +48,15 @@ function EntranceForm({
                         minLength="2"
                         maxLength="40"
                         value={password}
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                 </label>
-                <button
-                    type="submit"
-                    className="button entrance-page__submit-button">
-                    {!isLoading ? submitButtonName : submitButtonNameOnLoading}
-                </button>
-                {children}
-            </form>
+            </Form>
+
+            {children}
+
         </div>
     )
 }
 
-export default EntranceForm;
+export default EntrancePage;

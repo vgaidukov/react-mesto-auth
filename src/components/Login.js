@@ -1,6 +1,6 @@
 import { useHistory } from "react-router-dom";
-import EntranceForm from "./EntranceForm";
 import { useForm } from '../hooks/hooks';
+import EntrancePage from "./EntrancePage";
 
 function Login({ onLogin, isLoading }) {
 
@@ -25,10 +25,8 @@ function Login({ onLogin, isLoading }) {
             .catch((err) => console.log(err.message || 'Что-то пошло не так'));
     }
 
-    // к сожалению, не хватило времени переписать форму и инпуты на компоненты, но принцип понятен, спасибо! :)
-
     return (
-        <EntranceForm
+        <EntrancePage
             name="login"
             title="Вход"
             submitButtonName="Войти"

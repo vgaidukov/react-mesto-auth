@@ -13,8 +13,10 @@ function InfoTooltip({
             isOpen={isOpen}
             onClose={onClose}
         >
-            <img alt='message' src={infoTooltipMessage.img} />
-            <h3 className={`popup__title popup__title_type_${name}`}>{infoTooltipMessage.title}</h3>
+            <div className={`popup__window popup__window_type_${name} popup__content`}>
+                <img alt='message' src={infoTooltipMessage.img} />
+                <h3 className={`popup__title popup__title_type_${name}`}>{infoTooltipMessage.title}</h3>
+            </div>
         </Popup>
     )
 }

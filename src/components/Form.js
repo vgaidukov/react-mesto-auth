@@ -1,5 +1,6 @@
 function Form({
     name,
+    elementName,
     title,
     submitButtonName,
     submitButtonNameOnLoading,
@@ -11,15 +12,15 @@ function Form({
     return (
         <form
             name={name}
-            className="popup__form"
+            className={`${elementName}__form`}
             onSubmit={onSubmit}>
-            <h3 className={`popup__title popup__title_type_${name}`}>{title}</h3>
+            <h3 className={`${elementName}__title ${elementName}__title_type_${name}`}>{title}</h3>
 
             {children}
 
             <button
                 type="submit"
-                className="button popup__submit-button">
+                className={`button ${elementName}__submit-button`}>
                 {!isLoading ? submitButtonName : submitButtonNameOnLoading}
             </button>
         </form>
