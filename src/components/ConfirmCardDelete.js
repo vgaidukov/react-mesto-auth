@@ -1,5 +1,4 @@
-import Popup from './Popup';
-import Form from './Form';
+import PopupWithForm from './PopupWithForm';
 
 function ConfirmCardDelete({ card, isOpen, onClose, onConfirmDelete, isLoading }) {
     function handleSubmit(e) {
@@ -8,19 +7,16 @@ function ConfirmCardDelete({ card, isOpen, onClose, onConfirmDelete, isLoading }
     }
 
     return (
-        <Popup
+        <PopupWithForm
             name="card-delete-confirmation"
             isOpen={isOpen}
             onClose={onClose}
-        >
-            <Form
-                title="Вы уверены?"
-                submitButtonName="Да"
-                submitButtonNameOnLoading="Удаление ..."
-                isLoading={isLoading}
-                onSubmit={handleSubmit}
-            />
-        </Popup >
+            title="Вы уверены?"
+            submitButtonName="Да"
+            submitButtonNameOnLoading="Удаление ..."
+            isLoading={isLoading}
+            onSubmit={handleSubmit}>
+        </PopupWithForm>
     )
 }
 

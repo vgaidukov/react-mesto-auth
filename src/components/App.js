@@ -140,11 +140,11 @@ function App() {
         api
             .deleteCard(card._id)
             .then(() => {
-                setIsLoading(false);
                 setCards((cards) => cards.filter((c) => c._id !== card._id));
                 closeAllPopups();
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err))
+            .finally(() => setIsLoading(false));
     }
 
     // выгрузка новых данных пользователя в API и обновление информации на странице
@@ -153,11 +153,11 @@ function App() {
         api
             .patchUserInfo(newUserInfo)
             .then(updatedUserInfo => {
-                setIsLoading(false);
                 setCurrentUser(updatedUserInfo);
                 closeAllPopups();
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err))
+            .finally(() => setIsLoading(false));
     }
 
     // выгрузка нового аватара в API и обновление аватара на странице
@@ -166,24 +166,26 @@ function App() {
         api
             .patchNewAvatar(newAvatarLink)
             .then((updatedAvatar) => {
-                setIsLoading(false);
                 setCurrentUser(updatedAvatar);
                 closeAllPopups();
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err))
+            .finally(() => setIsLoading(false));
     }
 
     // выгрузка новой карточки  в API и обновление карточек на странице
     function handleAddCard(newCardData) {
+        console.log(isLoading + ' before');
         setIsLoading(true);
+        console.log(isLoading + ' after');
         api
             .postNewCard(newCardData)
             .then((newCard) => {
-                setIsLoading(false);
                 setCards([newCard, ...cards]);
                 closeAllPopups();
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err))
+            .finally(() => setIsLoading(false));
     }
 
     // АВТОРИЗАЦИЯ

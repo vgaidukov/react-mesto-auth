@@ -26,24 +26,21 @@ function Register({
     };
 
     return (
-        <>
-            <EntranceForm
-                name="register"
-                title="Регистрация"
-                submitButtonName="Зарегистрироваться"
-                submitButtonNameOnLoading="Регистрация ..."
-                isLoading={isLoading}
-                onSubmit={handleSubmit}
-                onChange={handleChange}
-                email={email}
-                password={password}
-            >
-                <p className="entrance-page__text">Уже зарегистрированы?
-                    <Link className="link entrance-page__link" to='/login'>Войти</Link>
-                </p>
-            </EntranceForm>
-        </>
-
+        <EntranceForm
+            name="register"
+            title="Регистрация"
+            submitButtonName="Зарегистрироваться"
+            submitButtonNameOnLoading="Регистрация ..."
+            isLoading={isLoading}
+            onSubmit={handleSubmit}
+            onChange={handleChange}
+            email={email}
+            password={password}
+        >
+            <p className="entrance-page__text">Уже зарегистрированы?
+                <Link className="link entrance-page__link" to='/login'>Войти</Link>
+            </p>
+        </EntranceForm>
     );
 }
 

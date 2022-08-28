@@ -1,11 +1,11 @@
 function Form({
     name,
-    children,
-    onSubmit,
     title,
-    isLoading,
     submitButtonName,
-    submitButtonNameOnLoading
+    submitButtonNameOnLoading,
+    isLoading,
+    onSubmit,
+    children
 }
 ) {
     return (
