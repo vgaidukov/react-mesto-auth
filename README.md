@@ -2,7 +2,7 @@
 
 #### _Интерактивная страница, куда можно добавлять фотографии, удалять их и ставить лайки_
 
-link: https://vgaidukov.github.io/mesto-react/
+link: https://vgaidukov.github.io/react-mesto-auth/
 
 ## Содержание проекта:
 
